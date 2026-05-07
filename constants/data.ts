@@ -17,7 +17,7 @@ export const tabs = [
   },
   {
     name: "settings",
-    title: "Settings  ",
+    title: "Settings",
     icon: icons.setting,
   },
 ];
