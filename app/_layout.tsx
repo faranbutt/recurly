@@ -3,7 +3,7 @@ import { useFonts } from "expo-font";
 import "@/global.css";
 import { useEffect } from "react";
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     "sans-regular": require("../assets/fonts/PlusJakartaSans-Regular.ttf"),
     "sans-medium": require("../assets/fonts/PlusJakartaSans-Medium.ttf"),
     "sans-light": require("../assets/fonts/PlusJakartaSans-Light.ttf"),
@@ -12,12 +12,15 @@ export default function RootLayout() {
     "sans-bold": require("../assets/fonts/PlusJakartaSans-Bold.ttf"),
   });
   useEffect(() => {
-    if (fontsLoaded) {
+    if (fontsLoaded || fontError) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded]);
-  if (!fontsLoaded) {
+  }, [fontsLoaded, fontError]);
+  if (!fontsLoaded && !fontError) {
     return null;
+  }
+  if (fontError) {
+    throw fontError;
   }
 
   return <Stack screenOptions={{ headerShown: false }} />;
