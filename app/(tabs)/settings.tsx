@@ -74,8 +74,13 @@ export default function Settings() {
         text: "Sign out",
         style: "destructive",
         onPress: async () => {
-          await signOut();
-          router.replace("/(auth)/sign-in");
+          try {
+            await signOut();
+            router.replace("/(auth)/sign-in");
+          } catch (err: any) {
+            console.error("Sign out error:", err?.message ?? err);
+            Alert.alert("Error", "Failed to sign out. Please try again.");
+          }
         },
       },
     ]);
@@ -84,7 +89,6 @@ export default function Settings() {
   return (
     <SafeAreaView className="flex-1 bg-background">
       <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 120 }}>
-        {/* ── Header ── */}
         <Text
           style={{
             fontSize: 28,
@@ -96,7 +100,6 @@ export default function Settings() {
           Settings
         </Text>
 
-        {/* ── Profile card ── */}
         <View
           style={{
             backgroundColor: "#FFF7E5",
