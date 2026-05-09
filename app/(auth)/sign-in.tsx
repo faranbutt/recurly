@@ -46,39 +46,59 @@ export default function SignIn() {
 
   const handleSignIn = async () => {
     if (!signIn) return;
-    const { error } = await signIn.password({ emailAddress, password });
-    if (error) {
-      console.error("Sign-in error:", JSON.stringify(error, null, 2));
-      return;
-    }
-    if (signIn.status === "complete") {
-      await signIn.finalize({
-        navigate: ({ decorateUrl }) => {
-          const url = decorateUrl("/");
-          if (!url.startsWith("http")) router.replace(url as Href);
-        },
-      });
-    } else if (signIn.status === "needs_client_trust") {
-      const emailCodeFactor = signIn.supportedSecondFactors?.find(
-        (f: any) => f.strategy === "email_code",
-      );
-      if (emailCodeFactor) {
-        await signIn.mfa.sendEmailCode();
-        setPendingMfa(true);
+    try {
+      const { error } = await signIn.password({ emailAddress, password });
+      if (error) {
+        console.error("Sign-in error:", JSON.stringify(error, null, 2));
+        return;
       }
+      if (signIn.status === "complete") {
+        try {
+          await signIn.finalize({
+            navigate: ({ decorateUrl }) => {
+              const url = decorateUrl("/");
+              if (!url.startsWith("http")) router.replace(url as Href);
+            },
+          });
+        } catch (err: any) {
+          console.error("Finalize error:", JSON.stringify(err, null, 2));
+        }
+      } else if (signIn.status === "needs_client_trust") {
+        const emailCodeFactor = signIn.supportedSecondFactors?.find(
+          (f: any) => f.strategy === "email_code",
+        );
+        if (emailCodeFactor) {
+          try {
+            await signIn.mfa.sendEmailCode();
+            setPendingMfa(true);
+          } catch (err: any) {
+            console.error("MFA send error:", JSON.stringify(err, null, 2));
+          }
+        }
+      }
+    } catch (err: any) {
+      console.error("Sign-in exception:", JSON.stringify(err, null, 2));
     }
   };
 
   const handleVerify = async () => {
     if (!signIn) return;
-    await signIn.mfa.verifyEmailCode({ code });
-    if (signIn.status === "complete") {
-      await signIn.finalize({
-        navigate: ({ decorateUrl }) => {
-          const url = decorateUrl("/");
-          if (!url.startsWith("http")) router.replace(url as Href);
-        },
-      });
+    try {
+      await signIn.mfa.verifyEmailCode({ code });
+      if (signIn.status === "complete") {
+        try {
+          await signIn.finalize({
+            navigate: ({ decorateUrl }) => {
+              const url = decorateUrl("/");
+              if (!url.startsWith("http")) router.replace(url as Href);
+            },
+          });
+        } catch (err: any) {
+          console.error("Finalize error:", JSON.stringify(err, null, 2));
+        }
+      }
+    } catch (err: any) {
+      console.error("Verification error:", JSON.stringify(err, null, 2));
     }
   };
 

@@ -46,37 +46,53 @@ export default function SignUp() {
 
   const handleSignUp = async () => {
     if (!signUp) return;
-    const { error } = await signUp.password({ emailAddress, password });
-    if (error) {
-      console.error("Sign-up error:", JSON.stringify(error, null, 2));
-      return;
+    try {
+      const { error } = await signUp.password({ emailAddress, password });
+      if (error) {
+        console.error("Sign-up error:", JSON.stringify(error, null, 2));
+        return;
+      }
+      try {
+        await signUp.verifications.sendEmailCode();
+        setPendingVerification(true);
+      } catch (err: any) {
+        console.error("Verification send error:", JSON.stringify(err, null, 2));
+      }
+    } catch (err: any) {
+      console.error("Sign-up exception:", JSON.stringify(err, null, 2));
     }
-    await signUp.verifications.sendEmailCode();
-    setPendingVerification(true);
   };
 
   const handleVerify = async () => {
     if (!signUp) return;
-    await signUp.verifications.verifyEmailCode({ code });
-    console.log(
-      "signUp status after verify:",
-      signUp.status,
-      "missing:",
-      signUp.missingFields,
-    );
-    if (
-      signUp.status === "complete" ||
-      (signUp.status === "missing_requirements" &&
-        (signUp.missingFields?.length ?? 0) === 0)
-    ) {
-      await signUp.finalize({
-        navigate: ({ decorateUrl }) => {
-          const url = decorateUrl("/");
-          if (!url.startsWith("http")) router.replace(url as Href);
-        },
-      });
-    } else {
-      console.error("Sign-up not complete. Missing:", signUp.missingFields);
+    try {
+      await signUp.verifications.verifyEmailCode({ code });
+      console.log(
+        "signUp status after verify:",
+        signUp.status,
+        "missing:",
+        signUp.missingFields,
+      );
+      if (
+        signUp.status === "complete" ||
+        (signUp.status === "missing_requirements" &&
+          (signUp.missingFields?.length ?? 0) === 0)
+      ) {
+        try {
+          await signUp.finalize({
+            navigate: ({ decorateUrl }) => {
+              const url = decorateUrl("/");
+              if (!url.startsWith("http")) router.replace(url as Href);
+            },
+          });
+        } catch (err: any) {
+          console.error("Finalize error:", JSON.stringify(err, null, 2));
+        }
+      } else {
+        console.error("Sign-up not complete. Missing:", signUp.missingFields);
+      }
+    } catch (err: any) {
+      console.error("Verification error:", JSON.stringify(err, null, 2));
     }
   };
 

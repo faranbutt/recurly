@@ -24,7 +24,7 @@ const SafeAreaView = styled(RNSafeAreaView);
 export default function Index() {
   const { user } = useUser();
   const displayName =
-    user.firstName ||
+    user?.firstName ||
     user?.lastName ||
     user?.emailAddresses[0]?.emailAddress ||
     "User";
@@ -40,7 +40,7 @@ export default function Index() {
               <View className="home-user">
                 <Image
                   source={
-                    user?.imageUrl ? { uri: user.imageUrl } : images.avatar
+                    user?.imageUrl ? { uri: user?.imageUrl } : images.avatar
                   }
                   className="home-avatar"
                 />
