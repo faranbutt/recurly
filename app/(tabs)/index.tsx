@@ -1,36 +1,39 @@
-import { Link } from "expo-router";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, Text, View, Pressable } from "react-native";
 import { styled } from "nativewind";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 import { Image } from "react-native";
 import images from "@/constants/image";
-import {
-  HOME_BALANCE,
-  HOME_SUBSCRIPTIONS,
-  HOME_USER,
-  UPCOMING_SUBSCRIPTIONS,
-} from "@/constants/data";
+import { HOME_BALANCE, UPCOMING_SUBSCRIPTIONS } from "@/constants/data";
 import { icons } from "@/constants/icons";
 import { formatCurrency } from "@/lib/utils";
 import dayjs from "dayjs";
+import { useState } from "react";
+import { useUser } from "@clerk/expo";
 
 import UpcomingSubscriptionCard from "@/components/UpcomingSubsciptionCard";
 import ListHeading from "@/components/listHeading";
 import SubscriptionCard from "@/components/SubscriptionCard";
-import { useState } from "react";
-import { useUser } from "@clerk/expo";
+import CreateSubscriptionModal from "@/components/CreateSubscriptionModal";
+import { useSubscriptions } from "@/lib/SubscriptionContext";
+
 const SafeAreaView = styled(RNSafeAreaView);
 
 export default function Index() {
   const { user } = useUser();
+  const { subscriptions, addSubscription } = useSubscriptions();
+
   const displayName =
     user?.firstName ||
     user?.lastName ||
     user?.emailAddresses[0]?.emailAddress ||
     "User";
-  const [expandedSubscriptionId, setExpandedSubscriptionId] = useState<
-    number | null
-  >(null);
+
+  // Written without angle brackets to avoid paste corruption
+  const [expandedSubscriptionId, setExpandedSubscriptionId] = useState(
+    null as string | null,
+  );
+  const [modalVisible, setModalVisible] = useState(false);
+
   return (
     <SafeAreaView className="flex-1 bg-background p-5">
       <FlatList
@@ -46,8 +49,11 @@ export default function Index() {
                 />
                 <Text className="home-user-name">{displayName}</Text>
               </View>
-              <Image source={icons.add} className="home-add-icon" />
+              <Pressable onPress={() => setModalVisible(true)} hitSlop={8}>
+                <Image source={icons.add} className="home-add-icon" />
+              </Pressable>
             </View>
+
             <View className="home-balance-card">
               <Text className="home-balance-label">Balance: </Text>
               <View className="home-balance-row">
@@ -59,6 +65,7 @@ export default function Index() {
                 </Text>
               </View>
             </View>
+
             <View className="mb-5">
               <ListHeading title="Upcoming" />
               <FlatList
@@ -76,10 +83,11 @@ export default function Index() {
                 }
               />
             </View>
+
             <ListHeading title="All Subscriptions" />
           </>
         )}
-        data={HOME_SUBSCRIPTIONS}
+        data={subscriptions}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <SubscriptionCard
@@ -99,7 +107,13 @@ export default function Index() {
           <Text className="home-empty-state">No Subscriptions yet</Text>
         }
         contentContainerClassName="pb-30"
-      ></FlatList>
+      />
+
+      <CreateSubscriptionModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        onSubmit={addSubscription}
+      />
     </SafeAreaView>
   );
 }
