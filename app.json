@@ -62,7 +62,8 @@
         {
           "photosPermission": "Allow Recurly to access your photos to update your profile picture."
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true
