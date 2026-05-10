@@ -26,6 +26,7 @@ export default function SignIn() {
   const [code, setCode] = React.useState("");
   const [pendingMfa, setPendingMfa] = React.useState(false);
   const [googleLoading, setGoogleLoading] = React.useState(false);
+  const [resendLoading, setResendLoading] = React.useState(false);
 
   const isFetching = fetchStatus === "fetching";
 
@@ -55,9 +56,8 @@ export default function SignIn() {
       if (signIn.status === "complete") {
         try {
           await signIn.finalize({
-            navigate: ({ decorateUrl }) => {
-              const url = decorateUrl("/");
-              if (!url.startsWith("http")) router.replace(url as Href);
+            navigate: () => {
+              router.replace("/(tabs)" as Href);
             },
           });
         } catch (err: any) {
@@ -88,9 +88,8 @@ export default function SignIn() {
       if (signIn.status === "complete") {
         try {
           await signIn.finalize({
-            navigate: ({ decorateUrl }) => {
-              const url = decorateUrl("/");
-              if (!url.startsWith("http")) router.replace(url as Href);
+            navigate: () => {
+              router.replace("/(tabs)" as Href);
             },
           });
         } catch (err: any) {
@@ -99,6 +98,18 @@ export default function SignIn() {
       }
     } catch (err: any) {
       console.error("Verification error:", JSON.stringify(err, null, 2));
+    }
+  };
+
+  const handleResend = async () => {
+    if (!signIn) return;
+    setResendLoading(true);
+    try {
+      await signIn.mfa.sendEmailCode();
+    } catch (err: any) {
+      console.error("Resend error:", JSON.stringify(err, null, 2));
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -155,11 +166,17 @@ export default function SignIn() {
                 </Pressable>
                 <Pressable
                   className="flex justify-center items-center py-3"
-                  onPress={() => signIn?.mfa.sendEmailCode()}
+                  disabled={isFetching || resendLoading}
+                  onPress={handleResend}
+                  style={{ opacity: isFetching || resendLoading ? 0.6 : 1 }}
                 >
-                  <Text className="font-sans-medium text-[#EA7A53]">
-                    Resend code
-                  </Text>
+                  {resendLoading ? (
+                    <ActivityIndicator color="#EA7A53" />
+                  ) : (
+                    <Text className="font-sans-medium text-[#EA7A53]">
+                      Resend code
+                    </Text>
+                  )}
                 </Pressable>
                 <Pressable
                   className="flex justify-center items-center py-1"

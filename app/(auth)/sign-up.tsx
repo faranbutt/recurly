@@ -26,6 +26,7 @@ export default function SignUp() {
   const [code, setCode] = React.useState("");
   const [pendingVerification, setPendingVerification] = React.useState(false);
   const [googleLoading, setGoogleLoading] = React.useState(false);
+  const [resendLoading, setResendLoading] = React.useState(false);
 
   const isFetching = fetchStatus === "fetching";
 
@@ -80,9 +81,8 @@ export default function SignUp() {
       ) {
         try {
           await signUp.finalize({
-            navigate: ({ decorateUrl }) => {
-              const url = decorateUrl("/");
-              if (!url.startsWith("http")) router.replace(url as Href);
+            navigate: () => {
+              router.replace("/(tabs)" as Href);
             },
           });
         } catch (err: any) {
@@ -96,7 +96,18 @@ export default function SignUp() {
     }
   };
 
-  // ── Verification screen ──────────────────────────────────
+  const handleResend = async () => {
+    if (!signUp) return;
+    setResendLoading(true);
+    try {
+      await signUp.verifications.sendEmailCode();
+    } catch (err: any) {
+      console.error("Resend error:", JSON.stringify(err, null, 2));
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   if (pendingVerification) {
     return (
       <SafeAreaView className="flex-1 bg-background p-5">
@@ -151,12 +162,17 @@ export default function SignUp() {
                 </Pressable>
                 <Pressable
                   className="flex justify-center items-center py-3"
-                  disabled={isFetching}
-                  onPress={() => signUp?.verifications.sendEmailCode()}
+                  disabled={isFetching || resendLoading}
+                  onPress={handleResend}
+                  style={{ opacity: isFetching || resendLoading ? 0.6 : 1 }}
                 >
-                  <Text className="font-sans-medium text-[#EA7A53]">
-                    Resend code
-                  </Text>
+                  {resendLoading ? (
+                    <ActivityIndicator color="#EA7A53" />
+                  ) : (
+                    <Text className="font-sans-medium text-[#EA7A53]">
+                      Resend code
+                    </Text>
+                  )}
                 </Pressable>
                 <Pressable
                   className="flex justify-center items-center py-1"
@@ -196,7 +212,7 @@ export default function SignUp() {
           <View className="border-[#E1DBCA] pt-9 pb-9 pr-6 pl-6 gap-6 border-1 rounded-2xl mt-4">
             {/* ── Google button ── */}
             <Pressable
-              onPress={handleGoogleSignUp}
+              onPress={handleGoogleSignUp} // or handleGoogleSignUp in sign-up.tsx
               disabled={googleLoading}
               style={{
                 opacity: googleLoading ? 0.7 : 1,
