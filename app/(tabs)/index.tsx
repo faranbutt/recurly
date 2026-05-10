@@ -18,9 +18,16 @@ import UpcomingSubscriptionCard from "@/components/UpcomingSubsciptionCard";
 import ListHeading from "@/components/listHeading";
 import SubscriptionCard from "@/components/SubscriptionCard";
 import { useState } from "react";
+import { useUser } from "@clerk/expo";
 const SafeAreaView = styled(RNSafeAreaView);
 
 export default function Index() {
+  const { user } = useUser();
+  const displayName =
+    user?.firstName ||
+    user?.lastName ||
+    user?.emailAddresses[0]?.emailAddress ||
+    "User";
   const [expandedSubscriptionId, setExpandedSubscriptionId] = useState<
     number | null
   >(null);
@@ -31,8 +38,13 @@ export default function Index() {
           <>
             <View className="home-header">
               <View className="home-user">
-                <Image source={images.avatar} className="home-avatar" />
-                <Text className="home-user-name">{HOME_USER.name}</Text>
+                <Image
+                  source={
+                    user?.imageUrl ? { uri: user?.imageUrl } : images.avatar
+                  }
+                  className="home-avatar"
+                />
+                <Text className="home-user-name">{displayName}</Text>
               </View>
               <Image source={icons.add} className="home-add-icon" />
             </View>

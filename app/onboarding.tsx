@@ -1,12 +1,16 @@
-import { View, Text } from "react-native";
 import React from "react";
+import { View, Text, TouchableOpacity, Image } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 
-const Onboarding = () => {
+export default function Onboarding() {
+  const router = useRouter();
+
   return (
-    <View>
-      <Text>Onboarding</Text>
-    </View>
+    <SafeAreaView className="auth-safe-area">
+      <View>
+        <Text>Onboarding page</Text>
+      </View>
+    </SafeAreaView>
   );
-};
-
-export default Onboarding;
+}
