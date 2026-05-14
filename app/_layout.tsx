@@ -59,7 +59,7 @@ export default function RootLayout() {
   return (
     <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
       <PostHogProvider
-        apiKey="phc_vWLiMinS4hAHP856JUFydAozWCtux9h2xpW5JMmiHvBi"
+        apiKey=""
         options={{
           host: "https://us.i.posthog.com",
           enableSessionReplay: true,
