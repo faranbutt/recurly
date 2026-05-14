@@ -6,7 +6,14 @@ import { ClerkProvider, useAuth } from "@clerk/expo";
 import { tokenCache } from "@/lib/cache";
 import { View, ActivityIndicator } from "react-native";
 
+import { PostHogProvider } from "posthog-react-native";
+
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
+const POST_HOG_API_KEY = process.env.EXPO_PUBLIC_POSTHOG_API_KEY;
+
+if (!POST_HOG_API_KEY) {
+  throw new Error("Add your PostHog API Key to the .env file");
+}
 
 if (!publishableKey) {
   throw new Error("Add your Clerk Publishable Key to the .env file");
@@ -51,7 +58,15 @@ export default function RootLayout() {
 
   return (
     <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
-      <Stack screenOptions={{ headerShown: false }} />
+      <PostHogProvider
+        apiKey="phc_vWLiMinS4hAHP856JUFydAozWCtux9h2xpW5JMmiHvBi"
+        options={{
+          host: "https://us.i.posthog.com",
+          enableSessionReplay: true,
+        }}
+      >
+        <Stack screenOptions={{ headerShown: false }} />
+      </PostHogProvider>
     </ClerkProvider>
   );
 }
