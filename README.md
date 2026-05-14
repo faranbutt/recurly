@@ -10,6 +10,11 @@ Recurly is a modern, mobile-first subscription management application designed t
 - **Multi-Category Tracking**: Categorize subscriptions (Entertainment, Utilities, Software, etc.) for better organization.
 - **Onboarding & Auth**: Secure and user-friendly authentication flow including onboarding for new users.
 
+## UI
+![UI-1](./assets/git-assets/recurly-01.jpg)
+![UI-2](./assets/git-assets/recurly-02.jpg)
+![UI-3](./assets/git-assets/recurly-03.jpg)
+
 ## 🛠 Tech Stack
 
 - **Framework**: [Expo](https://expo.dev/) (SDK 54)
