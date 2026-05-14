@@ -11,9 +11,12 @@ Recurly is a modern, mobile-first subscription management application designed t
 - **Onboarding & Auth**: Secure and user-friendly authentication flow including onboarding for new users.
 
 ## UI
-![UI-1](./assets/git-assets/recurly-01.jpg)
-![UI-2](./assets/git-assets/recurly-02.jpg)
-![UI-3](./assets/git-assets/recurly-03.jpg)
+
+<p align="center">
+  <img src="./assets/git-assets/recurly-01.jpg" width="250" />
+  <img src="./assets/git-assets/recurly-02.jpg" width="250" />
+  <img src="./assets/git-assets/recurly-03.jpg" width="250" />
+</p>
 
 ## 🛠 Tech Stack
 
